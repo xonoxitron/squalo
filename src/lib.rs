@@ -20,7 +20,7 @@
 //! Add this to your **```Cargo.toml```**:
 //! ```toml
 //! [dependencies]
-//! squalo = {version = 0.1.0}
+//! squalo = {version = 0.1.1}
 //! ```
 //! 
 //! and then add this to your **```code```**:
