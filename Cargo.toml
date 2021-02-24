@@ -1,0 +1,20 @@
+[package]
+name = "squalo"
+description = "🦈 Minimal, elegant, fast, async Kraken exchange WebSockets API client | Written in Rust"
+version = "0.1.0"
+authors = ["Matteo Pisani <matteo.pisani.91@gmail.com>"]
+license = "MIT"
+repository = "https://github.com/xonoxitron/squalo"
+documentation = "https://docs.rs/squalo/"
+keywords = ["rust", "kraken", "exchange", "api", "cryptocurrency"]
+categories = ["api-bindings", "web-programming::websocket"]
+readme = "README.md"
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+polipo = "0.2.4"
+tokio = {version = "1.2.0", features = ["full"]}
+tungstenite = "0.13.0"
+url = "2.2.1"
