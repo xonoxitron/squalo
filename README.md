@@ -21,7 +21,7 @@ If you are not familiar with, please have a look at [WebSockets API - FAQ](https
 Add this to your **```Cargo.toml```**:
 ```toml
 [dependencies]
-squalo = {version = 0.1.1}
+squalo = {version = 0.1.2}
 ```
 
 and then add this to your **```code```**:
@@ -48,7 +48,7 @@ squalo::set_kraken_api_credentials(api_key: String, api_secret: String);
 * *api_secret*: ```String```
 
 ```rust
-squalo::get_websockets_token();
+squalo::get_websockets_token().await;
 ```
 
 **Description**: retrieves a **```WebSockets API token```** with a **```signed```** request from a **```Kraken REST API```** endpoint.

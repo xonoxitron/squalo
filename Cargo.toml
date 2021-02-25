@@ -1,7 +1,7 @@
 [package]
 name = "squalo"
 description = "🦈 Minimal, elegant, fast, async Kraken exchange WebSockets API client | Written in Rust"
-version = "0.1.1"
+version = "0.1.2"
 authors = ["Matteo Pisani <matteo.pisani.91@gmail.com>"]
 license = "MIT"
 repository = "https://github.com/xonoxitron/squalo"
