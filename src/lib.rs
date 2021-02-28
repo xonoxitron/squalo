@@ -21,7 +21,7 @@
 //! 
 //! ```toml
 //! [dependencies]
-//! squalo = {version = 0.1.3}
+//! squalo = {version = 0.1.4}
 //! ```
 //! 
 //! and then add this to your **```code```**:
@@ -132,7 +132,7 @@
 //!     // creating communication channel for the websockets client
 //!     let (tx2, rx2) = squalo::create_communication_channel();
 //! 
-//!     // attaching websockets to public data stream
+//!     // attaching websockets to private data stream
 //!     squalo::attach_websockets_stream(callback, "private".to_string(), rx2);
 //! 
 //!     // transmitting payload to the websockets client
