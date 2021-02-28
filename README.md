@@ -19,12 +19,14 @@ If you are not familiar with, please have a look at [WebSockets API - FAQ](https
 # Implementation
 
 Add this to your **```Cargo.toml```**:
+
 ```toml
 [dependencies]
-squalo = {version = 0.1.2}
+squalo = {version = 0.1.3}
 ```
 
 and then add this to your **```code```**:
+
 ```rust
 use squalo;
 ```
@@ -34,6 +36,7 @@ use squalo;
 ```rust
 squalo::print_crate_info();
 ```
+
 **Description**: prints **```crate```** information (name, description, version, author and repository).
 
 ```rust
@@ -56,17 +59,30 @@ squalo::get_websockets_token().await;
 **Output**: returns a **```WebSockets API token```** in the **```String```** format.
 
 ```rust
-polipo::attach_websockets_stream(callback: fn(&str), stringified_json_message).await;
+squalo::create_communication_channel().await;
 ```
 
-**Description**: spawns a **```thread```** which initializes a **```WebSocket client```** and writes the **```stringified_json_message```**.
+**Description**: returns a couple of objects, an **```UnboundedSender```** *(tx)* and an **```UnboundedReceiver```** *(rx)* both used for bidirectional interoperation with the **```WebSocket client```**.
+
+```rust
+squalo::attach_websockets_stream(callback: fn(&str), stream_type: String, receiver: UnboundedReceiver<Message>).await;
+```
+
+**Description**: spawns a **```thread```** which initializes a **```WebSocket client```** (accordingly with the **```stream_type```**). The **```receiver```** bridges the gap with the incoming data **```stream```** and the **```callback```**.
 
 **Required**:
 
 * *callback*: ```fn``` (eg: *fn callback(data: &str) { println("data: {}", data); }*)
-* *stringified_json_message*: ```String``` (eg: *{"event":"subscribe", "subscription":{"name":"trade"}, "pair":["XBT/USD"]}*)
+* *stream_type*: ```String``` (eg *"public"* or *"private"*)
+* *receiver*: ```UnboundedReceiver<Message>``` (retrieved from the **```squalo::create_communication_channel()```** method)
 
 **Output**: any incoming message forwared from the **```WebSockets stream```** to the issued **```callback```** comes in stringified **```JSON```** format (parse accordingly with the outcome shape).
+
+```rust
+squalo::send_message(transmitter: UnboundedSender<Message>, payload: String);
+```
+
+**Description**: fowards a **```message```** to the spawned **```thread```** handling the **```WebSocket client```** that will write the **```payload```** to the stream.
 
 # Example
 
@@ -85,14 +101,21 @@ async fn main() {
     // printing crate information
     squalo::print_crate_info();
 
-    // enveloping a message pointing on public endpoint
-    let payload =
-        r#"{"event":"subscribe", "subscription":{"name":"trade"}, "pair":["XRP/EUR", "ETH/USD"]}"#.to_string();
+    // enveloping payload pointing at public endpoint
+    let payload1 =
+        r#"{"event":"subscribe", "subscription":{"name":"trade"}, "pair":["XRP/EUR", "ETH/USD"]}"#
+            .to_string();
 
-    // attaching websockets to public data stream
-    squalo::attach_websockets_stream(callback, payload).await;
+    // creating communication channel for the websockets client
+    let (tx1, rx1) = squalo::create_communication_channel();
 
-    // issuing credentials enables private data interaction
+    // attaching websockets to the public data stream
+    squalo::attach_websockets_stream(callback, "public".to_string(), rx1);
+
+    // transmitting payload to the websockets client
+    squalo::send_message(tx1.to_owned(), payload1);
+
+    // issuing credentials that enables private data interaction
     squalo::set_kraken_api_credentials(
         "YOUR_KRAKEN_API_KEY_HERE".to_string(),
         "YOUR_KRAKEN_API_SECRET".to_string(),
@@ -101,14 +124,33 @@ async fn main() {
     // requesting a websockets token
     let token = squalo::get_websockets_token().await;
 
-    // enveloping a message pointing on private endpoint
-    let payload = format!(
+    // enveloping message pointing at a private endpoint
+    let payload2 = format!(
         r#"{{"event":"subscribe", "subscription":{{"name":"ownTrades", "token":"{}"}}}}"#,
         token
     );
 
-    // attaching websockets to private data stream
-    squalo::attach_websockets_stream(callback, payload).await;
+    // creating communication channel for the websockets client
+    let (tx2, rx2) = squalo::create_communication_channel();
+
+    // attaching websockets to public data stream
+    squalo::attach_websockets_stream(callback, "private".to_string(), rx2);
+
+    // transmitting payload to the websockets client
+    squalo::send_message(tx2.to_owned(), payload2);
+
+    // enveloping the "ping" payload
+    let ping = r#"{"event":"ping"}"#.to_string();
+
+    // holding the main thread execution
+    loop {
+        // sleeping thread for 1 second
+        std::thread::sleep(std::time::Duration::from_millis(1000));
+        // transmitting ping payload to the first client (public)
+        squalo::send_message(tx1.to_owned(), ping.to_owned());
+        // transmitting ping payload to the second client (private)
+        squalo::send_message(tx2.to_owned(), ping.to_owned());
+    }
 }
 ```
 

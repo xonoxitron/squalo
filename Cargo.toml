@@ -1,20 +1,23 @@
 [package]
-name = "squalo"
-description = "🦈 Minimal, elegant, fast, async Kraken exchange WebSockets API client | Written in Rust"
-version = "0.1.2"
 authors = ["Matteo Pisani <matteo.pisani.91@gmail.com>"]
-license = "MIT"
-repository = "https://github.com/xonoxitron/squalo"
-documentation = "https://docs.rs/squalo/"
-keywords = ["rust", "kraken", "exchange", "api", "cryptocurrency"]
 categories = ["api-bindings", "web-programming::websocket"]
-readme = "README.md"
+description = "🦈 Minimal, elegant, fast, async Kraken exchange WebSockets API client | Written in Rust"
+documentation = "https://docs.rs/squalo/"
 edition = "2018"
+keywords = ["rust", "kraken", "exchange", "api", "cryptocurrency"]
+license = "MIT"
+name = "squalo"
+readme = "README.md"
+repository = "https://github.com/xonoxitron/squalo"
+version = "0.1.3"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+async-std = "1.9.0"
+async-tungstenite = {version = "0.13.0", features = ["async-std-runtime", "async-tls"]}
+futures = "0.3.13"
+futures-channel = "0.3.13"
 polipo = "0.2.5"
 tokio = {version = "1.2.0", features = ["full"]}
-tungstenite = "0.13.0"
 url = "2.2.1"

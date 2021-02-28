@@ -1,20 +1,23 @@
-use std::thread;
-use tungstenite::{connect, Message};
+use async_tungstenite::async_std::connect_async;
+use async_tungstenite::tungstenite::protocol::Message;
+use futures::{future, pin_mut, StreamExt};
 
-pub async fn initialize_websockets_stream(callback: fn(&str), payload: String) {
-    thread::spawn(move || {
-        let (mut socket, _) = connect(crate::config::get_kraken_websockets_api_url(
-            crate::utils::derive_stream_type(payload.to_owned()),
-        ))
-        .expect(r#"{{"error":"unable to connect"}}"#);
-        socket.write_message(Message::Text(payload)).unwrap();
-        loop {
-            match socket.read_message() {
-                Ok(response) => callback(response.to_text().unwrap()),
-                Err(error) => panic!(error),
-            };
-        }
-    })
-    .join()
-    .unwrap();
+pub async fn spawn_websockets_async_stream(
+    callback: fn(&str),
+    stream_type: String,
+    receiver: futures_channel::mpsc::UnboundedReceiver<Message>,
+) {
+    let (socket, _) = connect_async(crate::config::get_kraken_websockets_api_url(String::from(
+        stream_type,
+    )))
+    .await
+    .expect(r#"{{"error":"unable to connect"}}"#);
+    let (write, read) = socket.split();
+    let rx_to_ws = receiver.map(Ok).forward(write);
+    let ws_to_cb = read.for_each(|message| async {
+        let data = message.unwrap().to_string();
+        callback(data.as_str());
+    });
+    pin_mut!(rx_to_ws, ws_to_cb);
+    future::select(rx_to_ws, ws_to_cb).await;
 }
