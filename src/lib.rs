@@ -21,7 +21,7 @@
 //! 
 //! ```toml
 //! [dependencies]
-//! squalo = {version = 0.1.4}
+//! squalo = {version = 0.1.5}
 //! ```
 //! 
 //! and then add this to your **```code```**:
@@ -58,13 +58,13 @@
 //! **Output**: returns a **```WebSockets API token```** in the **```String```** format.
 //! 
 //! ```rust
-//! squalo::create_communication_channel().await;
+//! squalo::create_communication_channel();
 //! ```
 //! 
 //! **Description**: returns a couple of objects, an **```UnboundedSender```** *(tx)* and an **```UnboundedReceiver```** *(rx)* both used for bidirectional interoperation with the **```WebSocket client```**.
 //! 
 //! ```rust
-//! squalo::attach_websockets_stream(callback: fn(&str), stream_type: String, receiver: UnboundedReceiver<Message>).await;
+//! squalo::attach_websockets_stream(callback: fn(&str), stream_type: String, receiver: UnboundedReceiver<Message>);
 //! ```
 //! 
 //! **Description**: spawns a **```thread```** which initializes a **```WebSocket client```** (accordingly with the **```stream_type```**). The **```receiver```** bridges the gap with the incoming data **```stream```** and the **```callback```**.
