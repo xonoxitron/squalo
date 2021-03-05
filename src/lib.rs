@@ -21,7 +21,7 @@
 //! 
 //! ```toml
 //! [dependencies]
-//! squalo = {version = 0.1.5}
+//! squalo = {version = 0.1.6}
 //! ```
 //! 
 //! and then add this to your **```code```**:
@@ -64,14 +64,14 @@
 //! **Description**: returns a couple of objects, an **```UnboundedSender```** *(tx)* and an **```UnboundedReceiver```** *(rx)* both used for bidirectional interoperation with the **```WebSocket client```**.
 //! 
 //! ```rust
-//! squalo::attach_websockets_stream(callback: fn(&str), stream_type: String, receiver: UnboundedReceiver<Message>);
+//! squalo::attach_websockets_stream(callback: fn(String), stream_type: String, receiver: UnboundedReceiver<Message>);
 //! ```
 //! 
 //! **Description**: spawns a **```thread```** which initializes a **```WebSocket client```** (accordingly with the **```stream_type```**). The **```receiver```** bridges the gap with the incoming data **```stream```** and the **```callback```**.
 //! 
 //! **Required**:
 //! 
-//! * *callback*: ```fn``` (eg: *fn callback(data: &str) { println("data: {}", data); }*)
+//! * *callback*: ```fn``` (eg: *fn callback(data: String) { println("data: {}", data); }*)
 //! * *stream_type*: ```String``` (eg *"public"* or *"private"*)
 //! * *receiver*: ```UnboundedReceiver<Message>``` (retrieved from the **```squalo::create_communication_channel()```** method)
 //! 
@@ -90,7 +90,7 @@
 //! ```rust
 //! use squalo;
 //! 
-//! fn callback(data: &str) {
+//! fn callback(data: String) {
 //!     println!("data: {}", data);
 //! }
 //! 
@@ -175,7 +175,7 @@ use futures_channel::mpsc::{UnboundedReceiver, UnboundedSender};
 use polipo;
 
 pub fn print_crate_info() {
-    println!("-- CRATE INFO --\r\n{}", info::get_crate_info());
+    println!("-- CRATE INFO --\r\n{}\r\n", info::get_crate_info());
 }
 
 pub fn set_kraken_api_credentials(api_key: String, api_secret: String) {
@@ -193,7 +193,7 @@ pub fn create_communication_channel() -> (UnboundedSender<Message>, UnboundedRec
 }
 
 pub fn attach_websockets_stream(
-    callback: fn(&str),
+    callback: fn(String),
     stream_type: String,
     receiver: UnboundedReceiver<Message>,
 ) {
